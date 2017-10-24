@@ -1,8 +1,6 @@
 A/B测试项目：免费试学筛选器
 ===
 
-email：waynewqh@foxmail.com
-
 试验概述
 ---
 ---
