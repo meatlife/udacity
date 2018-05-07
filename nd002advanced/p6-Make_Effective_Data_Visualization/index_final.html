@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+
+	<title>
+		titanic data visualization
+	</title>
+
+	<style type="text/css">
+        h1 {
+    	 	margin-left: 350px;
+         	color: black;
+        }
+
+        p {
+        	width: 800px;
+        	margin-left: 50px;
+        }
+
+        div.c_button {
+			position: fixed;
+			top: 300px;
+			left: 930px;
+		}
+
+		div.c_button div {
+			background-color: orange;
+			padding: 5px;
+			margin: 10px;
+		}
+
+		div.n_button {
+			position: fixed;
+			top: 550px;
+			left: 930px;
+		}
+
+		div.n_button div {
+			background-color: pink;
+			padding: 5px;
+			margin: 10px;
+		}
+	</style>
+
+	<script type="text/javascript">
+		// 统计柱状图需要的数字
+		function bar_count(data, column) {
+			if (column == 'Sex') {	
+				var deceased_male = 0; deceased_female = 0;
+				var survived_male = 0; survived_female = 0;
+				var i = 0;
+				for (i = 0; i < data.length; i++) {
+					d = data[i];
+					if (d['Survived'] == "0") {
+						if (d[column] == "male")
+							deceased_male += 1;
+						else
+							deceased_female += 1;
+					} else {
+						if (d[column] == "male")
+							survived_male += 1;
+						else
+							survived_female += 1;
+					}
+				}
+				var result = [
+					{"Survival": "Deceased", "Sex": "male", "count": deceased_male},
+					{"Survival": "Deceased", "Sex": "female", "count": deceased_female},
+					{"Survival": "Survived", "Sex": "male", "count": survived_male},
+					{"Survival": "Survived", "Sex": "female", "count": survived_female}
+				];
+			}
+
+			else if (column == 'Pclass') {	
+				var deceased_1 = 0; deceased_2 = 0; deceased_3 = 0; 
+				var survived_1 = 0; survived_2 = 0; survived_3 = 0;
+				var i = 0;
+				for (i = 0; i < data.length; i++) {
+					d = data[i];
+					if (d['Survived'] == "0") {
+						if (d[column] == "1")
+							deceased_1 += 1;
+						else if (d[column] == "2")
+							deceased_2 += 1;
+						else if (d[column] == "3")
+							deceased_3 += 1;
+					} else {
+						if (d[column] == "1")
+							survived_1 += 1;
+						else if (d[column] == "2")
+							survived_2 += 1;
+						else if (d[column] == "3")
+							survived_3 += 1;
+					}
+				}
+
+				var result = [
+					{"Survival": "Deceased", "Pclass": "Upper class", "count": deceased_1},
+					{"Survival": "Deceased", "Pclass": "Middle class", "count": deceased_2},
+					{"Survival": "Deceased", "Pclass": "Lower class", "count": deceased_3},
+					{"Survival": "Survived", "Pclass": "Upper class", "count": survived_1},
+					{"Survival": "Survived", "Pclass": "Middle class", "count": survived_2},
+					{"Survival": "Survived", "Pclass": "Lower class", "count": survived_3}
+				];
+			}
+
+			else if (column == 'Embarked') {	
+				var deceased_c = 0; deceased_q = 0; deceased_s = 0; 
+				var survived_c = 0; survived_q = 0; survived_s = 0;
+				var i = 0;
+				for (i = 0; i < data.length; i++) {
+					d = data[i];
+					if (d['Survived'] == "0") 
+					{
+						if (d[column] == "C")
+							deceased_c += 1;
+						else if (d[column] == "Q")
+							deceased_q += 1;
+						else if (d[column] == "S")
+							deceased_s += 1;
+					} else {
+						if (d[column] == "C")
+							survived_c += 1;
+						else if (d[column] == "Q")
+							survived_q += 1;
+						else if (d[column] == "S")
+							survived_s += 1;
+					}
+				}
+
+				var result = [
+					{"Survival": "Deceased", "Embarked": "Cherbourg", "count": deceased_c},
+					{"Survival": "Deceased", "Embarked": "Queenstown", "count": deceased_q},
+					{"Survival": "Deceased", "Embarked": "Southampton", "count": deceased_s},
+					{"Survival": "Survived", "Embarked": "Cherbourg", "count": survived_c},
+					{"Survival": "Survived", "Embarked": "Queenstown", "count": survived_q},
+					{"Survival": "Survived", "Embarked": "Southampton", "count": survived_s}
+				];
+			}
+
+			// 年龄分成四层
+			else if (column == 'Age') {	
+				var deceased_y = 0; deceased_a = 0; deceased_m = 0; deceased_e = 0; 
+				var survived_y = 0; survived_a = 0; survived_m = 0; survived_e = 0;
+				var i = 0;
+				for (i = 0; i < data.length; i++) {
+					d = data[i];
+					if (d['Survived'] == "0" && !isNaN(d[column])) {
+						if (parseInt(d[column]) <= 20)
+							deceased_y += 1;
+						else if (parseInt(d[column]) > 20 && parseInt(d[column]) <= 40)
+							deceased_a += 1;
+						else if (parseInt(d[column]) > 40 && parseInt(d[column]) <= 60)
+							deceased_m += 1;						
+						else if (parseInt(d[column]) > 60)
+							deceased_e += 1;
+					} else if (d['Survived'] == "1" && !isNaN(d[column])) {
+						if (parseInt(d[column]) <= 20)
+							survived_y += 1;
+						else if (parseInt(d[column]) > 20 && parseInt(d[column]) <= 40)
+							survived_a += 1;
+						else if (parseInt(d[column]) > 40 && parseInt(d[column]) <= 60)
+							survived_m += 1;
+						else if (parseInt(d[column]) > 60)
+							survived_e += 1;
+					}
+				}
+
+				var result = [
+					{"Survival": "Deceased", "Age": "Youth(0~20)", "count": deceased_y},
+					{"Survival": "Deceased", "Age": "Adult(21~40)", "count": deceased_a},
+					{"Survival": "Deceased", "Age": "Mid-age(41~60)", "count": deceased_m},
+					{"Survival": "Deceased", "Age": "Elder(60+)", "count": deceased_e},
+					{"Survival": "Survived", "Age": "Youth(0~20)", "count": survived_y},
+					{"Survival": "Survived", "Age": "Adult(21~40)", "count": survived_a},
+					{"Survival": "Survived", "Age": "Mid-age(41~60)", "count": survived_m},
+					{"Survival": "Survived", "Age": "Elder(60+)", "count": survived_e}
+				];
+			}
+			return result;
+		};
+
+		// 画主图
+		function draw(data) {
+			// 定义画布大小
+			"use strict";
+			var margin = 75,
+				width = 900 - margin,
+				height = 600 - margin;
+
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", width + margin)
+						.attr("height", height + margin);
+			// 初始化图表
+			var col = "Sex"; 
+			var ctype = "count";
+			update(col, ctype);
+
+			// 根据按钮选项刷新图表
+			function update(column, type) {
+				// 清除原来的图表
+				d3.select("svg").selectAll("*").remove();
+
+				var result = bar_count(data, column);
+
+				// 利用dimple制作bar图
+				var myChart = new dimple.chart(svg, result);
+				myChart.setBounds(100, 60, 800, 420);
+				var x = myChart.addCategoryAxis("x", column);
+				x.fontSize = "20px";
+
+				// y轴选择计数或百分比
+				if (type == 'count') {
+					var y = myChart.addMeasureAxis("y", "count");
+					y.fontSize = "20px";					
+				} else if (type == 'percentage') {
+					var y = myChart.addPctAxis("y", "count");
+					y.fontSize = "20px";
+				}
+
+				var series = myChart.addSeries("Survival", dimple.plot.bar);
+				var z = myChart.addLegend(50, 10, 800, 10, "right", series);
+				z.fontSize = "14px";
+				myChart.draw(1000);
+				};
+
+			// 定义选择项目分类的按钮
+			var c_buttons = d3.select("body")
+							.append("div")
+							.attr("class", "c_button")
+							.selectAll(".c_button")
+							.data(["Sex", "Pclass", "Embarked", "Age"])
+							.enter()
+							.append("div")
+							.text(function(d) {return d;});
+
+			c_buttons.on("click", function(d) {
+							d3.select(".c_button")
+							.selectAll("div")
+							.transition()
+							.duration(500)
+							.style("color", "black")
+							.style("background", "orange");
+
+							d3.select(this)
+							.transition()
+							.duration(500)
+							.style("background", "lightBlue")
+							.style("color", "gray");
+							
+							col = d;
+							update(col, ctype);
+			});
+			// 定义选择计数或是百分比的按钮
+			var n_buttons = d3.select("body")
+                        	.append("div")
+                       		.attr("class", "n_button")
+                        	.selectAll(".n_button")
+                        	.data(["count", "percentage"])
+                        	.enter()
+                        	.append("div")
+                        	.text(function(d) {return d;});
+
+            n_buttons.on("click", function(d) {
+                        	d3.select(".n_button")
+                            .selectAll("div")
+                            .transition()
+                            .duration(500)
+                            .style("color", "black")
+                            .style("background", "pink");
+
+                            d3.select(this)
+                            .transition()
+                            .duration(500)
+                            .style("background", "lightBlue")
+                            .style("color", "gray");
+
+                            ctype = d;
+                            update(col, ctype);
+			});
+		};
+	</script>
+</head>
+<body>
+	<h1>
+		泰坦尼克号生还统计图
+	</h1>
+	<p>
+		本图表根据著名的泰坦尼克号数据集所制成。泰坦尼克号在1912年4月15日处女航时触礁沉没，2204名乘客和船员中有1502人遇难，仅3成人生还，此数据集包含2204名乘客中的891人的基本个人信息。
+		<br/>
+		<br/>
+		本图表通过柱状图的方式，根据不同性别（Sex）、年龄层（Age）、船舱等级（Pclass）以及登船港口（Embarked）这四个方面去统计数据集中遇难和生还的人数和比例。使用右上方按钮可以选择不同统计项目，右下方按钮可以选择显示各组的统计数字（count）还是百分比（percentage）。
+	</p>
+	<script type="text/javascript">
+		d3.csv('titanic-data.csv', draw);
+	</script>
+</body>
+</html>
